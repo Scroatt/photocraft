@@ -1,0 +1,58 @@
+# Web bundle for the mobile fork: the same static site photocraft's release job produces, so the
+# Android WebView app (Scroatt/PhotoCraft-Mobilr) can ship it without building Rust on a phone.
+#
+# Triggers on every push (any branch) and on demand. The artifact `web-mobile` holds
+# photocraft-web-<version>.zip: index.html, the wasm and the JS glue, with relative paths so it
+# works from file:// , any sub-path and inside an <iframe>.
+name: web-mobile
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A new push to the same branch cancels the run already going: only the newest build matters.
+concurrency:
+  group: web-mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  web:
+    name: build web bundle
+    runs-on: ubuntu-latest
+    env:
+      TRUNK_VERSION: 0.21.14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: web-mobile
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          cache-on-failure: true
+
+      # Pinned: a trunk upgrade can change the emitted index.html/glue (see packaging/web/README.md).
+      - name: Install trunk
+        run: |
+          curl -fsSL "https://github.com/trunk-rs/trunk/releases/download/v${TRUNK_VERSION}/trunk-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar -xz -C "$HOME/.cargo/bin" trunk
+          trunk --version
+
+      - name: Build and zip
+        run: packaging/web/package.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-mobile
+          path: dist/release/*
+          if-no-files-found: error
