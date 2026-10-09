@@ -48,10 +48,11 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
+      # Unlike upstream's jobs, this one saves from every branch: the fork is nowhere near the
+      # cache budget, and a saved target dir takes a wasm rebuild from ~6 minutes to ~1.
       - uses: Swatinem/rust-cache@v2
         with:
           key: web-mobile
-          save-if: ${{ github.ref == 'refs/heads/main' }}
           cache-on-failure: true
 
       # Pinned: a trunk upgrade can change the emitted index.html/glue (see packaging/web/README.md).
