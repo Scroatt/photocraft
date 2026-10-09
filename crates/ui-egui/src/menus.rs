@@ -112,6 +112,7 @@ fn workspace_name(id: &str) -> Option<&'static str> {
         "graphicAndWeb" => "Graphic and Web",
         "pixelArt" => "Pixel Art",
         "motion" => "Motion",
+        "mobile" => "Mobile",
         _ => return None,
     })
 }
@@ -1225,6 +1226,9 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
     // Presets use the default group order, heights and tabs (Reset brings everything back).
     app.ui.dock = Default::default();
     app.ui.dock_tabs = Default::default();
+    // Mobile is the phone/tablet layout: no right-hand dock, no status bar. Everything else keeps
+    // the panels it hides, so switching back to a desktop preset brings them straight back.
+    let mobile = app.ui.workspace == "Mobile";
     let p = &mut app.ui.panels;
     let (nav, color, layers, history, props) = match app.ui.workspace.as_str() {
         "Photography" => (true, false, true, true, true),
@@ -1242,6 +1246,22 @@ pub fn apply_workspace(app: &mut PhotocraftApp) {
     p.history = history;
     p.properties = props;
     p.character = app.ui.workspace == "Graphic and Web";
+    // The dock is the right-hand panel column: on a phone in landscape it is what leaves the menu
+    // items and tool options no room, so the Mobile workspace hides it (`ui()` in lib.rs reads the
+    // flag) and every other preset shows it again.
+    p.dock = !mobile;
+    // The status bar is the bottom strip. It is a shell preference the other presets deliberately
+    // leave alone, so Mobile hides it only while it is shown, remembers that, and the next preset
+    // puts it back — a user who switched it off by hand keeps it off.
+    if mobile {
+        // `||`: a Reset while Mobile is selected must not forget that Mobile hid it.
+        let was_shown = p.status_bar;
+        p.status_bar_hidden_by_mobile = p.status_bar_hidden_by_mobile || was_shown;
+        p.status_bar = false;
+    } else if p.status_bar_hidden_by_mobile {
+        p.status_bar = true;
+        p.status_bar_hidden_by_mobile = false;
+    }
     // Timeline is a floating panel, not a dock group. Showing it does not create or edit
     // a document timeline; changing away from Motion closes it just like its Close button.
     app.ui.timeline.open = app.ui.workspace == "Motion";

@@ -457,6 +457,8 @@ pub fn title_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) {
                         ("Graphic and Web".to_string(), tl!("Graphic and Web")),
                         ("Pixel Art".to_string(), tl!("Pixel Art")),
                         ("Motion".to_string(), tl!("Motion")),
+                        // Phone/tablet layout: hides the dock and the status bar.
+                        ("Mobile".to_string(), tl!("Mobile")),
                     ];
                     // A narrow bar drops what is also in a menu, Discord first (below), then
                     // the theme toggle (Preferences), then search (Edit › Search), and narrows

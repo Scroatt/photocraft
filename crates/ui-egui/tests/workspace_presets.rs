@@ -5,13 +5,15 @@ use photocraft_ui_egui::dock::{self, Group};
 use photocraft_ui_egui::{PhotocraftApp, menus};
 use serde_json::{Value, json};
 
-const PRESETS: [(&str, &str, &[Group], bool); 6] = [
+const PRESETS: [(&str, &str, &[Group], bool); 7] = [
     ("essentials", "Essentials", &[Group::Color, Group::Properties, Group::Layers], false),
     ("photography", "Photography", &[Group::Properties, Group::Navigator, Group::History, Group::Layers], false),
     ("painting", "Painting", &[Group::Color, Group::Layers], false),
     ("graphicAndWeb", "Graphic and Web", &[Group::Properties, Group::Character, Group::Layers], false),
     ("pixelArt", "Pixel Art", &[Group::Color, Group::Navigator, Group::Layers], false),
     ("motion", "Motion", &[Group::Properties, Group::Layers], true),
+    // Phone layout: Essentials' dock groups, no dock column and no status bar.
+    ("mobile", "Mobile", &[Group::Color, Group::Properties, Group::Layers], false),
 ];
 
 fn app() -> PhotocraftApp {
@@ -211,4 +213,39 @@ fn titlebar_picker_displays_every_selected_preset() {
         }
     }
     assert!(missing.is_empty(), "selected presets missing from titlebar picker: {missing:?}");
+}
+
+/// #1120 fork: Mobile is the phone/tablet layout. It hides the right-hand dock and the bottom
+/// status bar, and switching to another preset brings them back — except the status bar when the
+/// user had already hidden it by hand (it is a shell preference, not part of a workspace).
+#[test]
+fn mobile_hides_the_dock_and_status_bar_and_restores_them() {
+    let mut app = app();
+    assert!(app.ui.panels.dock && app.ui.panels.status_bar);
+
+    select(&mut app, "mobile");
+    assert_eq!(app.ui.workspace, "Mobile");
+    assert!(!app.ui.panels.dock, "Mobile hides the dock");
+    assert!(!app.ui.panels.status_bar, "Mobile hides the status bar");
+
+    // Resetting while still in Mobile must not forget that Mobile hid the status bar.
+    invoke(&mut app, "window.workspace.resetWorkspace", json!({}));
+    assert!(!app.ui.panels.dock && !app.ui.panels.status_bar);
+
+    select(&mut app, "essentials");
+    assert!(app.ui.panels.dock && app.ui.panels.status_bar, "Essentials brings both back");
+
+    // A status bar the user switched off stays off.
+    app.ui.panels.status_bar = false;
+    select(&mut app, "mobile");
+    select(&mut app, "photography");
+    assert!(!app.ui.panels.status_bar, "a hand-hidden status bar is left alone");
+    assert!(app.ui.panels.dock);
+
+    // Reachable from the Window › Workspace menu and from `window.workspace.select`.
+    select(&mut app, "mobile");
+    assert!(!app.ui.panels.dock);
+    let id = "window.workspace.mobile";
+    assert_eq!(menus::menu_items(&app).iter().find(|item| item.id == id).map(|item| item.checked), Some(Some(true)));
+    assert_eq!(menus::menu_items(&app).iter().find(|item| item.id == "window.workspace.essentials").map(|item| item.checked), Some(Some(false)));
 }

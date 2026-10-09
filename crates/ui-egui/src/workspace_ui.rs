@@ -98,7 +98,11 @@ fn open(app: &mut PhotocraftApp, kind: &str, f: Value) -> Result<Value, String> 
 }
 
 /// Built-in workspace names (Window › Workspace presets).
-const PRESETS: [&str; 6] = ["Essentials", "Photography", "Painting", "Pixel Art", "Graphic and Web", "Motion"];
+///
+/// "Mobile" is the phone/tablet layout of this fork: it drops the right-hand dock and the status
+/// bar (`ui.panels.dock`, `ui.panels.status_bar`), which a landscape phone screen has no room for;
+/// everything in them stays reachable from the Window menu. See `menus::apply_workspace`.
+const PRESETS: [&str; 7] = ["Essentials", "Photography", "Painting", "Pixel Art", "Graphic and Web", "Motion", "Mobile"];
 
 /// Run a shell command, or open its dialog. `None` when `id` isn't ours.
 pub fn menu(app: &mut PhotocraftApp, id: &str, params: &Value) -> Option<Result<Value, String>> {

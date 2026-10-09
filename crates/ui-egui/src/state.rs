@@ -336,6 +336,11 @@ pub struct Panels {
     /// What Tab hid (toolbar, options bar, dock), so a second Tab brings back just those.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub hidden_by_tab: Option<[bool; 3]>,
+    /// True when the Mobile workspace (this fork's phone layout) is what hid the status bar, so
+    /// another preset can put it back. The status bar is otherwise a shell preference that
+    /// workspaces don't touch; see `menus::apply_workspace`.
+    #[serde(default)]
+    pub status_bar_hidden_by_mobile: bool,
 }
 
 impl Default for Panels {
@@ -354,6 +359,7 @@ impl Default for Panels {
             toolbar_double: false,
             dock: true,
             hidden_by_tab: None,
+            status_bar_hidden_by_mobile: false,
         }
     }
 }
