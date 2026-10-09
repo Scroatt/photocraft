@@ -1,17 +1,22 @@
 # Web bundle for the mobile fork: the same static site photocraft's release job produces, so the
 # Android WebView app (Scroatt/PhotoCraft-Mobilr) can ship it without building Rust on a phone.
 #
-# Triggers on every push (any branch) and on demand. The artifact `web-mobile` holds
+# Triggers on every push (any branch but `ci-logs`) and on demand. The artifact `web-mobile` holds
 # photocraft-web-<version>.zip: index.html, the wasm and the JS glue, with relative paths so it
 # works from file:// , any sub-path and inside an <iframe>.
+#
+# The `Publish the build log` step is diagnostic: the Actions log API is blocked in the environment
+# this fork is driven from, so a failed build pushes its full output to the `ci-logs` branch,
+# which is excluded from the triggers. Remove it once the build is routine.
 name: web-mobile
 
 on:
   push:
+    branches-ignore: [ci-logs]
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 # A new push to the same branch cancels the run already going: only the newest build matters.
 concurrency:
@@ -28,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TRUNK_VERSION: 0.21.14
+      LOG: ${{ runner.temp }}/web-build.log
     steps:
       - uses: actions/checkout@v4
 
@@ -48,11 +54,58 @@ jobs:
             | tar -xz -C "$HOME/.cargo/bin" trunk
           trunk --version
 
+      # Disk space is the usual surprise on a cold wasm build; record it before starting.
+      - name: Build environment
+        run: |
+          {
+            echo "== $(date -u +%FT%TZ) run ${GITHUB_RUN_NUMBER} of ${GITHUB_REPOSITORY} @ ${GITHUB_SHA}"
+            echo "== rustc / cargo / trunk"
+            rustc -vV
+            cargo --version
+            trunk --version
+            echo "== installed targets"
+            rustup target list --installed
+            echo "== disk"
+            df -h /
+            echo "== tools"
+            for tool in zip curl git; do command -v "$tool" || echo "MISSING: $tool"; done
+          } 2>&1 | tee "$RUNNER_TEMP/build-env.txt"
+
       - name: Build and zip
-        run: packaging/web/package.sh
+        id: build
+        run: |
+          set -uo pipefail
+          : >"$LOG"
+          if packaging/web/package.sh >>"$LOG" 2>&1; then
+            tail -n 5 "$LOG"
+          else
+            code=$?
+            echo "::error::packaging/web/package.sh failed with exit code $code; last 300 lines:"
+            tail -n 300 "$LOG"
+            exit "$code"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
           name: web-mobile
           path: dist/release/*
           if-no-files-found: error
+
+      - name: Publish the build log
+        if: failure() && steps.build.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/ci-logs"
+          rm -rf "$work"
+          mkdir -p "$work/runs/${GITHUB_RUN_NUMBER}"
+          git init -q -b ci-logs "$work"
+          cd "$work"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          cp "$LOG" "runs/${GITHUB_RUN_NUMBER}/web-build.log"
+          cp "$RUNNER_TEMP/build-env.txt" "runs/${GITHUB_RUN_NUMBER}/build-env.txt"
+          git add -A
+          git commit -q -m "web-mobile build log: run ${GITHUB_RUN_NUMBER} (${GITHUB_SHA})"
+          git push -qf "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/ci-logs
