@@ -1,0 +1,294 @@
+2026-10-09T21:45:08.581052Z  INFO 🚀 Starting trunk 0.21.14
+2026-10-09T21:45:08.581355Z  INFO 📦 starting build
+[1m[92m   Compiling[0m proc-macro2 v1.0.107
+[1m[92m   Compiling[0m unicode-ident v1.0.26
+[1m[92m   Compiling[0m quote v1.0.47
+[1m[92m   Compiling[0m libm v0.2.16
+[1m[92m   Compiling[0m cfg-if v1.0.5
+[1m[92m   Compiling[0m autocfg v1.5.1
+[1m[92m   Compiling[0m smallvec v1.16.2
+[1m[92m   Compiling[0m syn v3.0.6
+[1m[92m   Compiling[0m num-traits v0.2.19
+[1m[92m   Compiling[0m once_cell v1.21.4
+[1m[92m   Compiling[0m version_check v0.9.5
+[1m[92m   Compiling[0m bitflags v2.13.2
+[1m[92m   Compiling[0m arrayvec v0.7.8
+[1m[92m   Compiling[0m thiserror v2.0.21
+[1m[92m   Compiling[0m wasm-bindgen-shared v0.2.129
+[1m[92m   Compiling[0m syn v2.0.119
+[1m[92m   Compiling[0m log v0.4.34
+[1m[92m   Compiling[0m simd-adler32 v0.3.10
+[1m[92m   Compiling[0m foldhash v0.2.0
+[1m[92m   Compiling[0m rustversion v1.0.23
+[1m[92m   Compiling[0m zerocopy v0.8.59
+[1m[92m   Compiling[0m hashbrown v0.17.1
+[1m[92m   Compiling[0m adler2 v2.0.1
+[1m[92m   Compiling[0m crc32fast v1.5.2
+[1m[92m   Compiling[0m bumpalo v3.20.3
+[1m[92m   Compiling[0m synstructure v0.14.0
+[1m[92m   Compiling[0m wasm-bindgen v0.2.129
+[1m[92m   Compiling[0m wasm-bindgen-macro-support v0.2.129
+[1m[92m   Compiling[0m serde_core v1.0.229
+[1m[92m   Compiling[0m miniz_oxide v0.9.1
+[1m[92m   Compiling[0m futures-task v0.3.34
+[1m[92m   Compiling[0m slab v0.4.12
+[1m[92m   Compiling[0m futures-core v0.3.34
+[1m[92m   Compiling[0m pin-project-lite v0.2.17
+[1m[92m   Compiling[0m zmij v1.0.23
+[1m[92m   Compiling[0m futures-util v0.3.34
+[1m[92m   Compiling[0m flate2 v1.1.10
+[1m[92m   Compiling[0m serde v1.0.229
+[1m[92m   Compiling[0m stable_deref_trait v1.2.1
+[1m[92m   Compiling[0m cfg_aliases v0.2.2
+[1m[92m   Compiling[0m slotmap v1.1.1
+[1m[92m   Compiling[0m photocraft-cms v0.5.0 (/home/runner/work/photocraft/photocraft/crates/cms)
+[1m[33mwarning[0m[1m: constant `PAR_MIN_PIXELS` is never used[0m
+   [1m[94m--> [0mcrates/cms/src/transform.rs:513:7
+    [1m[94m|[0m
+[1m[94m513[0m [1m[94m|[0m const PAR_MIN_PIXELS: usize = 16 * 1024;
+    [1m[94m|[0m       [1m[33m^^^^^^^^^^^^^^[0m
+    [1m[94m|[0m
+    [1m[94m= [0m[1mnote[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+[1m[33mwarning[0m[1m: constant `PAR_CHUNK_PIXELS` is never used[0m
+   [1m[94m--> [0mcrates/cms/src/transform.rs:514:7
+    [1m[94m|[0m
+[1m[94m514[0m [1m[94m|[0m const PAR_CHUNK_PIXELS: usize = 8 * 1024;
+    [1m[94m|[0m       [1m[33m^^^^^^^^^^^^^^^^[0m
+
+[1m[92m   Compiling[0m zerocopy-derive v0.8.59
+[1m[33mwarning[0m: `photocraft-cms` (lib) generated 2 warnings
+[1m[92m   Compiling[0m parking_lot_core v0.9.12
+[1m[92m   Compiling[0m writeable v0.6.4
+[1m[92m   Compiling[0m linebender_resource_handle v0.1.1
+[1m[92m   Compiling[0m miniz_oxide v0.8.9
+[1m[92m   Compiling[0m bytemuck_derive v1.12.1
+[1m[92m   Compiling[0m thiserror-impl v2.0.21
+[1m[92m   Compiling[0m bytemuck v1.25.2
+[1m[92m   Compiling[0m zerofrom-derive v0.1.8
+[1m[92m   Compiling[0m yoke-derive v0.8.3
+[1m[92m   Compiling[0m serde_derive v1.0.229
+[1m[92m   Compiling[0m wasm-bindgen-macro v0.2.129
+[1m[92m   Compiling[0m half v2.7.1
+[1m[92m   Compiling[0m zerovec-derive v0.11.6
+[1m[92m   Compiling[0m zerofrom v0.1.8
+[1m[92m   Compiling[0m yoke v0.8.3
+[1m[92m   Compiling[0m displaydoc v0.2.7
+[1m[92m   Compiling[0m js-sys v0.3.106
+[1m[92m   Compiling[0m font-types v0.12.5
+[1m[92m   Compiling[0m read-fonts v0.41.0
+[1m[92m   Compiling[0m zerovec v0.11.8
+[1m[92m   Compiling[0m equivalent v1.0.2
+[1m[92m   Compiling[0m scopeguard v1.2.0
+[1m[92m   Compiling[0m serde_json v1.0.151
+[1m[92m   Compiling[0m lock_api v0.4.14
+[1m[92m   Compiling[0m indexmap v2.14.2
+[1m[92m   Compiling[0m tinystr v0.8.4
+[1m[92m   Compiling[0m fdeflate v0.3.7
+[1m[92m   Compiling[0m memchr v2.8.3
+[1m[92m   Compiling[0m rustc-hash v1.1.0
+[1m[92m   Compiling[0m itoa v1.0.18
+[1m[92m   Compiling[0m weezl v0.1.12
+[1m[92m   Compiling[0m litemap v0.8.3
+[1m[92m   Compiling[0m icu_locale_core v2.3.0
+[1m[92m   Compiling[0m photocraft-color v0.5.0 (/home/runner/work/photocraft/photocraft/crates/color)
+[1m[92m   Compiling[0m photocraft-geom v0.5.0 (/home/runner/work/photocraft/photocraft/crates/geom)
+[1m[92m   Compiling[0m photocraft-raster v0.5.0 (/home/runner/work/photocraft/photocraft/crates/raster)
+[1m[92m   Compiling[0m naga-types v30.0.1
+[1m[92m   Compiling[0m parking_lot v0.12.5
+[1m[92m   Compiling[0m potential_utf v0.1.6
+[1m[92m   Compiling[0m zerotrie v0.2.5
+[1m[92m   Compiling[0m naga v30.0.1
+[1m[92m   Compiling[0m web-sys v0.3.106
+[1m[92m   Compiling[0m color_quant v1.1.0
+[1m[92m   Compiling[0m unicode-width v0.2.2
+[1m[92m   Compiling[0m raw-window-handle v0.6.2
+[1m[92m   Compiling[0m bit-vec v0.9.1
+[1m[92m   Compiling[0m profiling v1.0.18
+[1m[92m   Compiling[0m codespan-reporting v0.13.1
+[1m[92m   Compiling[0m bit-set v0.10.0
+[1m[92m   Compiling[0m icu_provider v2.3.1
+[1m[92m   Compiling[0m skrifa v0.44.0
+[1m[92m   Compiling[0m harfrust v0.12.0
+[1m[92m   Compiling[0m polycool v0.4.0
+[1m[92m   Compiling[0m static_assertions v1.1.0
+[1m[92m   Compiling[0m utf8_iter v1.0.4
+[1m[92m   Compiling[0m byteorder-lite v0.1.0
+[1m[92m   Compiling[0m icu_collections v2.3.0
+[1m[92m   Compiling[0m kurbo v0.13.1
+[1m[92m   Compiling[0m photocraft-doc v0.5.0 (/home/runner/work/photocraft/photocraft/crates/doc)
+[1m[92m   Compiling[0m color v0.3.3
+[1m[92m   Compiling[0m num-complex v0.4.6
+[1m[92m   Compiling[0m wgpu-hal v30.0.1
+[1m[92m   Compiling[0m euclid v0.22.14
+[1m[92m   Compiling[0m core_maths v0.1.1
+[1m[92m   Compiling[0m quick-error v2.0.1
+[1m[92m   Compiling[0m icu_properties_data v2.3.0
+[1m[92m   Compiling[0m icu_locale_fallback_data v2.3.0
+[1m[92m   Compiling[0m paste v1.0.15
+[1m[92m   Compiling[0m float-cmp v0.9.0
+[1m[92m   Compiling[0m strict-num v0.1.1
+[1m[92m   Compiling[0m ttf-parser v0.25.1
+[1m[92m   Compiling[0m guillotiere v0.7.0
+[1m[92m   Compiling[0m peniko v0.6.1
+[1m[92m   Compiling[0m pulp v0.22.3
+[1m[92m   Compiling[0m ahash v0.8.12
+[1m[92m   Compiling[0m arrayref v0.3.9
+[1m[92m   Compiling[0m unicode-general-category v1.1.0
+[1m[92m   Compiling[0m icu_segmenter_data v2.3.0
+[1m[92m   Compiling[0m shlex v2.0.1
+[1m[92m   Compiling[0m either v1.18.0
+[1m[92m   Compiling[0m fearless_simd v0.4.1
+[1m[92m   Compiling[0m pxfm v0.1.30
+[1m[92m   Compiling[0m icu_normalizer_data v2.3.0
+[1m[92m   Compiling[0m crossbeam-utils v0.8.23
+[1m[92m   Compiling[0m find-msvc-tools v0.1.14
+[1m[92m   Compiling[0m moxcms v0.8.1
+[1m[92m   Compiling[0m cc v1.5.1
+[1m[92m   Compiling[0m wgpu-types v30.0.1
+[1m[92m   Compiling[0m glow v0.17.0
+[1m[92m   Compiling[0m vello_common v0.1.0
+[1m[92m   Compiling[0m wgpu-naga-bridge v30.0.1
+[1m[92m   Compiling[0m tiny-skia-path v0.11.4
+[1m[92m   Compiling[0m image-webp v0.2.4
+[1m[92m   Compiling[0m gif v0.14.2
+[1m[92m   Compiling[0m png v0.18.1
+[1m[92m   Compiling[0m qoi v0.4.1
+[1m[92m   Compiling[0m emath v0.36.2
+[1m[92m   Compiling[0m wgpu-core v30.0.1
+[1m[92m   Compiling[0m kurbo v0.11.3
+[1m[92m   Compiling[0m num-integer v0.1.47
+[1m[92m   Compiling[0m unicode-properties v0.1.4
+[1m[92m   Compiling[0m reborrow v0.5.5
+[1m[92m   Compiling[0m unicode-ccc v0.4.0
+[1m[92m   Compiling[0m siphasher v1.0.4
+[1m[92m   Compiling[0m crossbeam-epoch v0.9.21
+[1m[92m   Compiling[0m tinyvec v1.13.3
+[1m[92m   Compiling[0m litrs v1.0.0
+[1m[92m   Compiling[0m bitflags v1.3.2
+[1m[92m   Compiling[0m unicode-bidi-mirroring v0.4.0
+[1m[92m   Compiling[0m unicode-script v0.5.8
+[1m[92m   Compiling[0m pulp-wasm-simd-flag v0.1.1
+[1m[92m   Compiling[0m rustybuzz v0.20.1
+[1m[92m   Compiling[0m fontdb v0.23.0
+[1m[92m   Compiling[0m document-features v0.2.12
+[1m[92m   Compiling[0m png v0.17.16
+[1m[92m   Compiling[0m svgtypes v0.15.3
+[1m[92m   Compiling[0m ecolor v0.36.2
+[1m[92m   Compiling[0m image v0.25.10
+[1m[92m   Compiling[0m wgpu-core-deps-wasm v30.0.1
+[1m[92m   Compiling[0m icu_locale_fallback v2.3.0
+[1m[92m   Compiling[0m icu_properties v2.3.0
+[1m[92m   Compiling[0m blake3 v1.8.7
+[1m[92m   Compiling[0m vello_cpu v0.1.0
+[1m[92m   Compiling[0m wasm-bindgen-futures v0.4.79
+[1m[92m   Compiling[0m wgpu v30.0.1
+[1m[92m   Compiling[0m zune-inflate v0.2.54
+[1m[92m   Compiling[0m simplecss v0.2.2
+[1m[92m   Compiling[0m memmap2 v0.9.11
+[1m[92m   Compiling[0m twox-hash v2.1.4
+[1m[92m   Compiling[0m roxmltree v0.20.0
+[1m[92m   Compiling[0m uuid v1.26.1
+[1m[92m   Compiling[0m unicode-segmentation v1.13.3
+[1m[92m   Compiling[0m xmlwriter v0.1.0
+[1m[92m   Compiling[0m heic-rs v0.1.1
+[1m[92m   Compiling[0m strength_reduce v0.2.4
+[1m[92m   Compiling[0m wasmparser v0.228.0
+[1m[92m   Compiling[0m epaint_default_fonts v0.36.2
+[1m[92m   Compiling[0m nohash-hasher v0.2.0
+[1m[92m   Compiling[0m self_cell v1.3.0
+[1m[92m   Compiling[0m unicode-bidi v0.3.18
+[1m[92m   Compiling[0m zune-core v0.4.12
+[1m[92m   Compiling[0m data-url v0.3.2
+[1m[92m   Compiling[0m wasmi_ir v2.0.0
+[1m[92m   Compiling[0m base64 v0.22.1
+[1m[92m   Compiling[0m unicode-vo v0.1.0
+[1m[92m   Compiling[0m bit_field v0.10.3
+[1m[92m   Compiling[0m zune-core v0.5.3
+[1m[92m   Compiling[0m crossbeam-deque v0.8.8
+[1m[92m   Compiling[0m imagesize v0.13.0
+[1m[92m   Compiling[0m parlance v0.1.0
+[1m[92m   Compiling[0m pico-args v0.5.0
+[1m[92m   Compiling[0m lebe v0.5.3
+[1m[92m   Compiling[0m usvg v0.45.1
+[1m[92m   Compiling[0m fontique v0.11.1
+[1m[92m   Compiling[0m exr v1.74.2
+[1m[92m   Compiling[0m zune-jpeg v0.5.15
+[1m[92m   Compiling[0m zune-jpeg v0.4.21
+[1m[92m   Compiling[0m photocraft-heif v0.5.0 (/home/runner/work/photocraft/photocraft/crates/heif)
+[1m[92m   Compiling[0m epaint v0.36.2
+[1m[92m   Compiling[0m transpose v0.2.3
+[1m[92m   Compiling[0m accesskit v0.24.1
+[1m[92m   Compiling[0m ruzstd v0.9.0
+[1m[92m   Compiling[0m icu_normalizer v2.3.0
+[1m[92m   Compiling[0m icu_segmenter v2.3.0
+[1m[92m   Compiling[0m parley_data v0.11.1
+[1m[92m   Compiling[0m tiny-skia v0.11.4
+[1m[92m   Compiling[0m primal-check v0.3.4
+[1m[92m   Compiling[0m itertools v0.15.0
+[1m[92m   Compiling[0m photocraft-vector v0.5.0 (/home/runner/work/photocraft/photocraft/crates/vector)
+[1m[92m   Compiling[0m tiff v0.11.3
+[1m[92m   Compiling[0m gif v0.13.3
+[1m[92m   Compiling[0m rgb v0.8.53
+[1m[92m   Compiling[0m wasmi_core v2.0.0
+[1m[92m   Compiling[0m constant_time_eq v0.4.2
+[1m[92m   Compiling[0m jpeg-encoder v0.6.1
+[1m[92m   Compiling[0m photocraft-text v0.5.0 (/home/runner/work/photocraft/photocraft/crates/text)
+[1m[92m   Compiling[0m wasmi v2.0.0
+[1m[92m   Compiling[0m rayon-core v1.13.0
+[1m[92m   Compiling[0m winnow v1.0.4
+[1m[92m   Compiling[0m photocraft-codecs v0.5.0 (/home/runner/work/photocraft/photocraft/crates/codecs)
+[1m[92m   Compiling[0m toml_parser v1.1.3+spec-1.1.0
+[1m[92m   Compiling[0m resvg v0.45.1
+[1m[92m   Compiling[0m egui v0.36.2
+[1m[92m   Compiling[0m photocraft-compose v0.5.0 (/home/runner/work/photocraft/photocraft/crates/compose)
+[1m[92m   Compiling[0m rustfft v6.4.1
+[1m[92m   Compiling[0m parley v0.11.1
+[1m[92m   Compiling[0m toml_datetime v1.1.1+spec-1.1.0
+[1m[92m   Compiling[0m serde_spanned v1.1.1
+[1m[92m   Compiling[0m photocraft-psd v0.5.0 (/home/runner/work/photocraft/photocraft/crates/psd)
+[1m[92m   Compiling[0m spin v0.9.9
+[1m[92m   Compiling[0m wasmi_collections v2.0.0
+[1m[92m   Compiling[0m rustc-hash v2.1.3
+[1m[92m   Compiling[0m toml_writer v1.1.2+spec-1.1.0
+[1m[92m   Compiling[0m toml v1.1.6+spec-1.1.0
+[1m[92m   Compiling[0m type-map v0.5.1
+[1m[92m   Compiling[0m photocraft-algo v0.5.0 (/home/runner/work/photocraft/photocraft/crates/algo)
+[1m[92m   Compiling[0m photocraft-format v0.5.0 (/home/runner/work/photocraft/photocraft/crates/format)
+[1m[92m   Compiling[0m photocraft-affinity v0.5.0 (/home/runner/work/photocraft/photocraft/crates/affinity)
+[1m[92m   Compiling[0m web-time v1.1.0
+[1m[92m   Compiling[0m photocraft-paint v0.5.0 (/home/runner/work/photocraft/photocraft/crates/paint)
+[1m[92m   Compiling[0m enum-map-derive v0.17.0
+[1m[92m   Compiling[0m photocraft-raw v0.5.0 (/home/runner/work/photocraft/photocraft/crates/raw)
+[1m[92m   Compiling[0m enum-map v2.7.3
+[1m[92m   Compiling[0m egui-wgpu v0.36.2
+[1m[92m   Compiling[0m photocraft-io v0.5.0 (/home/runner/work/photocraft/photocraft/crates/io)
+[1m[92m   Compiling[0m photocraft-plugins v0.5.0 (/home/runner/work/photocraft/photocraft/crates/plugins)
+[1m[92m   Compiling[0m rayon v1.12.0
+[1m[92m   Compiling[0m photocraft-ui-egui v0.5.0 (/home/runner/work/photocraft/photocraft/crates/ui-egui)
+[1m[92m   Compiling[0m photocraft-ops v0.5.0 (/home/runner/work/photocraft/photocraft/crates/ops)
+[1m[92m   Compiling[0m percent-encoding v2.3.2
+[1m[92m   Compiling[0m rfd v0.17.2
+[1m[92m   Compiling[0m eframe v0.36.2
+[1m[92m   Compiling[0m photocraft-engine v0.5.0 (/home/runner/work/photocraft/photocraft/crates/engine)
+[1m[92m   Compiling[0m egui_extras v0.36.2
+[1m[92m   Compiling[0m photocraft-gpu v0.5.0 (/home/runner/work/photocraft/photocraft/crates/gpu)
+[1m[33mwarning[0m[1m: constant `OPENABLE` is never used[0m
+   [1m[94m--> [0mcrates/engine/src/file_cmds.rs:118:7
+    [1m[94m|[0m
+[1m[94m118[0m [1m[94m|[0m const OPENABLE: &[&str] = &[
+    [1m[94m|[0m       [1m[33m^^^^^^^^[0m
+    [1m[94m|[0m
+    [1m[94m= [0m[1mnote[0m: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+[1m[33mwarning[0m: `photocraft-engine` (lib) generated 1 warning
+[1m[92m   Compiling[0m photocraft-web v0.5.0 (/home/runner/work/photocraft/photocraft/apps/photocraft-web)
+[1m[92m    Finished[0m `wasm-release` profile [optimized] target(s) in 5m 39s
+2026-10-09T21:50:53.849744Z  INFO downloading wasm-bindgen version="0.2.129"
+2026-10-09T21:50:54.153442Z  INFO installing wasm-bindgen
+2026-10-09T21:50:59.633272Z  INFO downloading wasm-opt version="version_123"
+2026-10-09T21:51:00.134886Z  INFO installing wasm-opt
+2026-10-09T21:51:56.156141Z  INFO applying new distribution
+2026-10-09T21:51:56.156466Z  INFO ✅ success
+photocraft-web-ba8a1ff998f5a84_bg.wasm: 25647742 bytes (24 MiB; limit 25165824)
+error: photocraft-web-ba8a1ff998f5a84_bg.wasm is 25647742 bytes, over the 25165824-byte limit (Cloudflare's per-file cap is 25 MiB)
