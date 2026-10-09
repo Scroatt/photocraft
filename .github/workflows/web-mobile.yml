@@ -33,7 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TRUNK_VERSION: 0.21.14
-      LOG: ${{ runner.temp }}/web-build.log
+      # `$RUNNER_TEMP`, not `${{ runner.temp }}`: the `runner` context is not available in `env`.
+      LOG: web-build.log
     steps:
       - uses: actions/checkout@v4
 
@@ -75,6 +76,7 @@ jobs:
         id: build
         run: |
           set -uo pipefail
+          LOG="$RUNNER_TEMP/$LOG"
           : >"$LOG"
           if packaging/web/package.sh >>"$LOG" 2>&1; then
             tail -n 5 "$LOG"
@@ -97,6 +99,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          LOG="$RUNNER_TEMP/$LOG"
           work="$RUNNER_TEMP/ci-logs"
           rm -rf "$work"
           mkdir -p "$work/runs/${GITHUB_RUN_NUMBER}"
