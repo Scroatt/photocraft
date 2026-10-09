@@ -35,6 +35,12 @@ jobs:
       TRUNK_VERSION: 0.21.14
       # `$RUNNER_TEMP`, not `${{ runner.temp }}`: the `runner` context is not available in `env`.
       LOG: web-build.log
+      # packaging/web/package.sh fails the build above 24 MiB. That gate is upstream's guard for
+      # Cloudflare Pages/Workers, which reject any single file over 25 MiB (issue #198); with
+      # rustc 1.99 this build's wasm is 25,647,742 bytes (24.5 MiB), so the gate fails here.
+      # This bundle is embedded in the APK and served from file://, so no CDN per-file cap
+      # applies: 32 MiB is this fork's ceiling. If it ever passes 25 MiB, keep it off Cloudflare.
+      PHOTOCRAFT_WASM_MAX_BYTES: "33554432"
     steps:
       - uses: actions/checkout@v4
 
