@@ -150,12 +150,17 @@ jobs:
       ANDROID_VERSION_NAME: 0.5.0.${{ github.run_number }}
       ANDROID_VERSION_CODE: ${{ github.run_number }}
     steps:
+      # `token`: the GITHUB_TOKEN of this repository cannot read a private one. Set the repository
+      # secret ANDROID_REPO_TOKEN (a personal access token with read access to the app's repo) if
+      # it is private; without the secret the default token is used, which is enough while it is
+      # public.
       - name: Check out the Android app
         uses: actions/checkout@v4
         with:
           repository: Scroatt/PhotoCraft-Mobilr
           ref: arena/723a898b-androcraft
           path: android-app
+          token: ${{ secrets.ANDROID_REPO_TOKEN || github.token }}
 
       - name: Download this run's web bundle
         uses: actions/download-artifact@v4
