@@ -1,13 +1,18 @@
-# Web bundle for the mobile fork: the same static site photocraft's release job produces, so the
-# Android WebView app (Scroatt/PhotoCraft-Mobilr) can ship it without building Rust on a phone.
+# Web bundle + debug APK for the mobile fork, from a single run.
 #
-# Triggers on every push (any branch but `ci-logs`) and on demand. The artifact `web-mobile` holds
-# photocraft-web-<version>.zip: index.html, the wasm and the JS glue, with relative paths so it
-# works from file:// , any sub-path and inside an <iframe>.
+# Triggers on every push (any branch but `ci-logs`) and on demand.
 #
-# The `Publish the build log` step is diagnostic: the Actions log API is blocked in the environment
-# this fork is driven from, so a failed build pushes its full output to the `ci-logs` branch,
-# which is excluded from the triggers. Remove it once the build is routine.
+#   web  — the same static site photocraft's release job produces. The artifact `web-mobile` holds
+#          photocraft-web-<version>.zip: index.html, the wasm and the JS glue, with relative paths
+#          so it works from file:// , any sub-path and inside an <iframe>.
+#   apk  — a debug APK built from the Android sources in Scroatt/PhotoCraft-Mobilr, with the
+#          bundle this run just built dropped into its assets. That repository lives elsewhere and
+#          this token cannot write to it, so the job only reads it (public checkout) and builds
+#          here. Artifact: `photocraft-android-debug`.
+#
+# The `Publish the build log` steps are diagnostic: the Actions log API is blocked in the
+# environment this fork is driven from, so a failed job pushes its full output to the `ci-logs`
+# branch, which is excluded from the triggers. Remove them once the build is routine.
 name: web-mobile
 
 on:
@@ -16,7 +21,10 @@ on:
   workflow_dispatch:
 
 permissions:
+  # contents: write — the diagnostic `Publish the build log` steps push to the ci-logs branch.
+  # actions: read   — the apk job downloads this run's `web-mobile` artifact.
   contents: write
+  actions: read
 
 # A new push to the same branch cancels the run already going: only the newest build matters.
 concurrency:
@@ -105,17 +113,132 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
+          set -uo pipefail
           LOG="$RUNNER_TEMP/$LOG"
+          [ -f "$LOG" ] || exit 0
           work="$RUNNER_TEMP/ci-logs"
           rm -rf "$work"
-          mkdir -p "$work/runs/${GITHUB_RUN_NUMBER}"
-          git init -q -b ci-logs "$work"
+          mkdir -p "$work"
+          # Append to whatever is already on the branch: the apk job publishes to the same run.
+          git clone -q --depth 1 --branch ci-logs "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$work" \
+            || git init -q -b ci-logs "$work"
           cd "$work"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p "runs/${GITHUB_RUN_NUMBER}"
           cp "$LOG" "runs/${GITHUB_RUN_NUMBER}/web-build.log"
           cp "$RUNNER_TEMP/build-env.txt" "runs/${GITHUB_RUN_NUMBER}/build-env.txt"
           git add -A
           git commit -q -m "web-mobile build log: run ${GITHUB_RUN_NUMBER} (${GITHUB_SHA})"
-          git push -qf "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/ci-logs
+          # Best effort: the two jobs of a run can publish at the same moment.
+          git push -q "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/ci-logs \
+            || echo "ci-logs: push lost to the apk job's concurrent one (the log tail is in the step output)"
+
+  # Debug APK with the bundle built above, so a phone test needs nothing but this run's artifacts.
+  # The Android sources are read from Scroatt/PhotoCraft-Mobilr (a public checkout): this token
+  # cannot push there, so the app is compiled here instead of in its own repository. Change
+  # `ref` to follow a different branch of that project (e.g. main) once its scripts are updated.
+  apk:
+    name: debug APK with this bundle
+    needs: web
+    runs-on: ubuntu-latest
+    env:
+      # `$RUNNER_TEMP`, not `${{ runner.temp }}`: the `runner` context is not available in `env`.
+      LOG: apk-build.log
+      # versionName 0.5.0.<run> / versionCode <run>: every run installs over the previous one
+      # (Android only upgrades by version code) and the app info says which build it is.
+      ANDROID_VERSION_NAME: 0.5.0.${{ github.run_number }}
+      ANDROID_VERSION_CODE: ${{ github.run_number }}
+    steps:
+      - name: Check out the Android app
+        uses: actions/checkout@v4
+        with:
+          repository: Scroatt/PhotoCraft-Mobilr
+          ref: arena/723a898b-androcraft
+          path: android-app
+
+      - name: Download this run's web bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: web-mobile
+          path: bundle
+
+      # The app's own scripts/fetch-web.sh downloads a published release; here the bundle is the
+      # one this run just built, so it is unzipped into the assets by hand (same layout).
+      - name: Put the bundle in the APK's assets
+        run: |
+          set -euo pipefail
+          zip="$(find bundle -name 'photocraft-web-*.zip' | head -n 1)"
+          [ -n "$zip" ] || { echo "erro: nenhum photocraft-web-*.zip no artefato web-mobile"; exit 1; }
+          version="$(basename "$zip" .zip)"
+          version="${version#photocraft-web-}"
+          dest="android-app/android/app/src/main/assets/web"
+          rm -rf "$dest"
+          mkdir -p "$(dirname "$dest")"
+          unzip -q "$zip" -d unzipped
+          cp -R "unzipped/photocraft-web-$version" "$dest"
+          rm -f "$dest/_headers" "$dest/.htaccess" "$dest/HOSTING.md"
+          {
+            echo "repo:     $GITHUB_REPOSITORY run $GITHUB_RUN_ID"
+            echo "arquivo:  $(basename "$zip")"
+            echo "versão:   $version"
+            echo "wasm:     $(cd "$dest" && ls -l *.wasm | awk '{ print $9, $5 " bytes" }')"
+          } | tee "$dest/BUNDLE.txt"
+          du -sh "$dest"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # The Android project doesn't commit gradle-wrapper.jar, so the version is pinned here
+      # (the same 8.10.2 its own workflow uses).
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.10.2
+
+      - name: Build debug APK
+        id: apk
+        working-directory: android-app/android
+        run: |
+          set -uo pipefail
+          LOG="$RUNNER_TEMP/$LOG"
+          : >"$LOG"
+          if gradle --no-daemon --console=plain :app:assembleDebug >>"$LOG" 2>&1; then
+            tail -n 5 "$LOG"
+          else
+            code=$?
+            echo "::error::gradle failed with exit code $code; last 300 lines:"
+            tail -n 300 "$LOG"
+            exit "$code"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: photocraft-android-debug
+          path: android-app/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Publish the build log
+        if: failure() && steps.apk.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          LOG="$RUNNER_TEMP/$LOG"
+          [ -f "$LOG" ] || exit 0
+          work="$RUNNER_TEMP/ci-logs"
+          rm -rf "$work"
+          mkdir -p "$work"
+          git clone -q --depth 1 --branch ci-logs "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$work" \
+            || git init -q -b ci-logs "$work"
+          cd "$work"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p "runs/${GITHUB_RUN_NUMBER}"
+          cp "$LOG" "runs/${GITHUB_RUN_NUMBER}/apk-build.log"
+          git add -A
+          git commit -q -m "web-mobile apk log: run ${GITHUB_RUN_NUMBER} (${GITHUB_SHA})"
+          git push -q "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/ci-logs \
+            || git push -qf "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/ci-logs \
+            || echo "ci-logs: push failed (the log tail is in the step output)"
