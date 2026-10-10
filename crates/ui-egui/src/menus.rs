@@ -885,6 +885,9 @@ pub fn menu_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> f32 {
     let mut clicked: Option<String> = None;
     let t = crate::theme::Tokens::get(ui.ctx());
     let mut nav = crate::menu_nav::Nav::load(ui.ctx());
+    // The popup id of each top-level menu and the bar's own rect, both for `close_menu_on_touch`.
+    let mut tops: Vec<egui::Id> = Vec::with_capacity(TOP_MENUS.len());
+    let mut bar: Option<egui::Rect> = None;
     ui.scope(|ui| {
         ui.spacing_mut().item_spacing.x = 0.0;
         let v = &mut ui.style_mut().visuals;
@@ -943,11 +946,16 @@ pub fn menu_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> f32 {
             }
             right = buttons.iter().map(|b| b.rect.right()).fold(right, f32::max);
             switch_on_hover(ui.ctx(), &buttons);
-            let tops: Vec<egui::Id> = buttons.iter().map(egui::Popup::default_response_id).collect();
+            tops = buttons.iter().map(egui::Popup::default_response_id).collect();
+            bar = Some(ui.max_rect());
             nav.keys(ui.ctx(), &tops, &mut clicked);
         });
     });
     nav.store(ui.ctx());
+    // Touch: egui's own close-on-click-outside needs a real click, which a finger tap often isn't.
+    if let Some(bar) = bar {
+        close_menu_on_touch(ui.ctx(), &tops, bar);
+    }
     // The press-drag gesture ends with the button (its release was handled by the rows above).
     if ui.input(|i| i.pointer.primary_released() || !i.pointer.primary_down()) {
         ui.ctx().data_mut(|d| d.remove::<bool>(press_gesture_id()));
@@ -959,8 +967,55 @@ pub fn menu_bar(app: &mut PhotocraftApp, ui: &mut egui::Ui) -> f32 {
             app.ui.status = e;
             app.ui.status_error = true;
         }
+        // Running an item closes its menu. egui does that on the click; a tap that never becomes
+        // one would leave the menu open, so close every top-level menu here as well.
+        for popup in &tops {
+            egui::Popup::close_id(&ctx, *popup);
+        }
     }
     right
+}
+
+/// Where the pointer last was while it existed: a touch pointer is gone the moment it is
+/// released, so the tap that should close a menu has no position on the frame it ends.
+fn last_pointer_id() -> egui::Id {
+    egui::Id::new("menu-last-pointer")
+}
+
+/// Closes an open top-level menu when the pointer is pressed or released outside it.
+///
+/// egui closes a popup on a *click* outside it, and on a phone a tap often isn't one: the finger
+/// slides further than `max_click_dist` (6 points) or is held past `max_click_duration`, so
+/// `clicked_elsewhere()` never becomes true and the menu stays open — with no keyboard, the
+/// back button was the only way out. Press and release both close it, as on the desktop: native
+/// menus dismiss on press outside too.
+///
+/// A submenu that is open is left to egui: it has its own area, so a tap on it is a tap on a
+/// menu, and choosing an item there closes the whole menu anyway.
+fn close_menu_on_touch(ctx: &egui::Context, popups: &[egui::Id], bar: egui::Rect) {
+    let open: Vec<egui::Id> = popups.iter().copied().filter(|id| egui::Popup::is_id_open(ctx, *id)).collect();
+    if open.is_empty() {
+        return;
+    }
+    let (pressed, released, pos) = ctx.input(|i| (i.pointer.any_pressed(), i.pointer.any_released(), i.pointer.interact_pos()));
+    if !pressed && !released {
+        return;
+    }
+    if let Some(p) = pos {
+        ctx.data_mut(|d| d.insert_temp(last_pointer_id(), p));
+    }
+    let Some(p) = ctx.data(|d| d.get_temp::<egui::Pos2>(last_pointer_id())) else { return };
+    if !open.iter().all(|id| egui::containers::menu::MenuState::is_deepest_open_sub_menu(ctx, *id)) {
+        return;
+    }
+    // Last frame's rects: the popup's own response is what egui hit-tests against.
+    let on_menu = bar.contains(p) || open.iter().filter_map(|id| ctx.read_response(*id)).any(|r| r.interact_rect.contains(p));
+    if on_menu {
+        return;
+    }
+    for id in &open {
+        egui::Popup::close_id(ctx, *id);
+    }
 }
 
 fn press_gesture_id() -> egui::Id {
